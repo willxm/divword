@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"unicode"
 
@@ -27,14 +28,19 @@ func main() {
 	var segmenter sego.Segmenter
 	//load dictionary
 	segmenter.LoadDictionary("data/dictionary.txt")
+
 	//load news data
+	log.Printf("载入文本")
 	text := readFile("data/news.txt")
+
 	//load stopword
+	log.Printf("载入停用词词典")
 	stopwords := readFile("data/stopwords.txt")
 	sws := strings.Split(string(stopwords), "\n")
 
+	//process segment
+	log.Printf("分词...")
 	segments := segmenter.Segment(text)
-
 	texts := sego.SegmentsToSlice(segments, false)
 
 	fo, err := os.Create("sego.txt")
@@ -42,9 +48,9 @@ func main() {
 		panic(err)
 	}
 	defer fo.Close()
-
 	l := len(sws)
-
+	//process stopwords
+	log.Printf("去除停用词...")
 	for _, v := range texts {
 		var i int
 		i = 0
@@ -59,4 +65,5 @@ func main() {
 			fo.WriteString(v + "\t")
 		}
 	}
+	log.Printf("完成")
 }
